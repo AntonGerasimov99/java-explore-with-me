@@ -1,8 +1,8 @@
-package ru.practicum.server.mapper;
+package ru.practicum.mapper;
 
 import ru.practicum.dto.StatisticRequestDto;
-import ru.practicum.server.model.App;
-import ru.practicum.server.model.Hit;
+import ru.practicum.model.App;
+import ru.practicum.model.Hit;
 
 public class HitMapper {
 

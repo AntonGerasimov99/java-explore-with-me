@@ -1,4 +1,4 @@
-package ru.practicum.server.model;
+package ru.practicum.model;
 
 import lombok.*;
 import org.hibernate.annotations.OnDelete;

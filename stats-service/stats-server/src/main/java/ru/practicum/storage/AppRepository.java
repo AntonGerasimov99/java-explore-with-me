@@ -1,8 +1,8 @@
-package ru.practicum.server.storage;
+package ru.practicum.storage;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.practicum.server.model.App;
+import ru.practicum.model.App;
 
 import java.util.Optional;
 
