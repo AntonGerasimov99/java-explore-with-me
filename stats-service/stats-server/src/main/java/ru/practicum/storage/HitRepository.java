@@ -20,12 +20,12 @@ public interface HitRepository extends JpaRepository<Hit, Long> {
             "order by count(h.ip) desc")
     List<StatisticResponseDto> getStatsByTimeAndUris(LocalDateTime start, LocalDateTime end, List<String> uris);
 
-    @Query("select new ru.practicum.dto.StatisticResponseDto(a.name, h.uri, count(h.ip))" +
+    @Query("select new ru.practicum.dto.StatisticResponseDto(a.name, h.uri, count(distinct h.ip))" +
             "from Hit as h join App as a on h.app.id = a.id " +
             "where h.timestamp between :start and :end " +
             "and h.uri in (:uris) " +
             "group by a.name, h.uri " +
-            "order by count(h.ip) desc")
+            "order by count(distinct h.ip) desc")
     List<StatisticResponseDto> getStatsByTimeAndUrisUnique(LocalDateTime start, LocalDateTime end, List<String> uris);
 
     @Query("select new ru.practicum.dto.StatisticResponseDto(a.name, h.uri, count(h.ip))" +
@@ -35,10 +35,10 @@ public interface HitRepository extends JpaRepository<Hit, Long> {
             "order by count(h.ip) desc")
     List<StatisticResponseDto> getStatsByTime(LocalDateTime start, LocalDateTime end);
 
-    @Query("select new ru.practicum.dto.StatisticResponseDto(a.name, h.uri, count(h.ip))" +
+    @Query("select new ru.practicum.dto.StatisticResponseDto(a.name, h.uri, count(distinct h.ip))" +
             "from Hit as h join App as a on h.app.id = a.id " +
             "where h.timestamp between :start and :end " +
             "group by a.name, h.uri " +
-            "order by count(h.ip) desc")
+            "order by count(distinct h.ip) desc")
     List<StatisticResponseDto> getStatsByTimeUnique(LocalDateTime start, LocalDateTime end);
 }
