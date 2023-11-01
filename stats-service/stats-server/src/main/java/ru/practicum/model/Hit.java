@@ -18,7 +18,7 @@ public class Hit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "hit_id", nullable = false)
+    @Column(name = "hit_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

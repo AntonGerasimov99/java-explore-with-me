@@ -10,6 +10,7 @@ import ru.practicum.service.StatsService;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class StatsController {
     @ResponseStatus(HttpStatus.OK)
     public List<StatisticResponseDto> getStats(@RequestParam String start,
                                                @RequestParam String end,
-                                               @RequestParam(required = false) List<String> uris,
+                                               @RequestParam(required = false) Optional<List<String>> uris,
                                                @RequestParam(defaultValue = "false") Boolean unique) {
         log.info("Received request to get stats");
         return service.getStatistic(start, end, uris, unique);

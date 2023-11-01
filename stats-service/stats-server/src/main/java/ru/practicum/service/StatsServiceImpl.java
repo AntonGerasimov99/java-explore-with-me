@@ -31,7 +31,8 @@ public class StatsServiceImpl implements StatsService {
         App app = new App();
         if (checkApp.isEmpty()) {
             log.info("App not found");
-            appRepository.save(App.builder().name(requestDto.getApp()).build());
+            app.setName(requestDto.getApp());
+            appRepository.save(app);
             log.info("App saved in repository");
         } else {
             app = checkApp.get();
@@ -42,24 +43,24 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     @Transactional
-    public List<StatisticResponseDto> getStatistic(String start, String end, List<String> uris, boolean unique) {
+    public List<StatisticResponseDto> getStatistic(String start, String end, Optional<List<String>> uris, boolean unique) {
 
         LocalDateTime startTime = LocalDateTime.parse(start, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         LocalDateTime endTime = LocalDateTime.parse(end, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-        if (unique && uris.isEmpty()) {
+        if (unique && uris.isPresent()) {
+            log.info("Hit getStatsByTimeAndUrisUnique");
+            return hitRepository.getStatsByTimeAndUrisUnique(startTime, endTime, uris.get());
+        }
+        if (!unique && uris.isPresent()) {
+            log.info("Hit getStatsByTimeAndUris");
+            return hitRepository.getStatsByTimeAndUris(startTime, endTime, uris.get());
+        }
+        if (unique) {
             log.info("Hit getStatsByTimeUnique");
             return hitRepository.getStatsByTimeUnique(startTime, endTime);
         }
-        if (!unique && uris.isEmpty()) {
-            log.info("Hit getStatsByTime");
-            return hitRepository.getStatsByTime(startTime, endTime);
-        }
-        if (!unique) {
-            log.info("Hit getStatsByTimeAndUris");
-            return hitRepository.getStatsByTimeAndUris(startTime, endTime, uris);
-        }
-        log.info("Hit getStatsByTimeAndUrisUnique");
-        return hitRepository.getStatsByTimeAndUrisUnique(startTime, endTime, uris);
+        log.info("Hit getStatsByTime");
+        return hitRepository.getStatsByTime(startTime, endTime);
     }
 }
