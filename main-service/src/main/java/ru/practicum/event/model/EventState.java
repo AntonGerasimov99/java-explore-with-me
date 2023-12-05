@@ -5,5 +5,7 @@ public enum EventState {
     PUBLISHED,
     CANCELED;
 
-    //todo parse??
+    public static EventState parseState(String s) {
+        return EventState.valueOf(s);
+    }
 }

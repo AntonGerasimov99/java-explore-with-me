@@ -18,7 +18,9 @@ import ru.practicum.request.storage.RequestRepository;
 import ru.practicum.user.model.User;
 import ru.practicum.user.storage.UserRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -63,6 +65,23 @@ public class RequestServiceImpl implements RequestService {
         return requests.stream()
                 .map(RequestMapper::requestToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public Map<Long, Long> getConfirmedRequests(List<Event> events) {
+        List<Long> eventIds = events.stream()
+                .map(Event::getId)
+                .collect(Collectors.toList());
+        List<EventConfirmedRequests> confirmedRequests = requestRepository.findConfirmedRequestsByEventId(eventIds);
+        Map<Long, Long> result = new HashMap<>();
+        if (confirmedRequests.isEmpty()) {
+            return result;
+        }
+        for (EventConfirmedRequests res : confirmedRequests) {
+            result.put(res.getEventId(), res.getAmountConfirmedRequests());
+        }
+        return result;
     }
 
 
