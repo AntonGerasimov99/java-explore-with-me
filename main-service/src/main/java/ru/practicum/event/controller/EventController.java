@@ -38,7 +38,8 @@ public class EventController {
                                                @RequestParam(defaultValue = "10") @Positive int size,
                                                HttpServletRequest request) {
         log.info("Receive request to get public events by param");
-        List<EventShortDto> result = eventService;
+        List<EventShortDto> result = eventService.getEventsPublic(text, categories, paid, rangeStart, rangeEnd,
+                onlyAvailable, sort, from, size, request);
         sendStat(request);
         return result;
     }
@@ -47,7 +48,7 @@ public class EventController {
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto publicGetEvent(@PathVariable long eventId, HttpServletRequest request) {
         log.info("Receive request to get public event with id: {}", eventId);
-        EventFullDto result = eventService;
+        EventFullDto result = eventService.getEventPublic(eventId, request);
         sendStat(request);
         return result;
     }

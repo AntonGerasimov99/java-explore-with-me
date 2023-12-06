@@ -17,7 +17,7 @@ public interface EventService {
 
     List<EventShortDto> getEventsPublic(long userId, int from, int size);
 
-    EventRequestStatusUpdateResult updateEventRequest(long userId, long eventId, EventConfirmedRequests eventConfirmedRequests);
+    EventRequestStatusUpdateResult updateEventRequest(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
 
     List<RequestDto> getEventRequests(long userId, long eventId);
 

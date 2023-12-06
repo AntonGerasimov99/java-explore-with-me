@@ -25,10 +25,10 @@ import ru.practicum.event.storage.LocationRepository;
 import ru.practicum.exception.NotFoundElementException;
 import ru.practicum.exception.RequestException;
 import ru.practicum.exception.ValidationException;
-import ru.practicum.request.dto.EventConfirmedRequests;
 import ru.practicum.request.dto.RequestDto;
 import ru.practicum.request.mapper.RequestMapper;
 import ru.practicum.request.model.Request;
+import ru.practicum.request.model.RequestStatus;
 import ru.practicum.request.service.RequestService;
 import ru.practicum.request.storage.RequestRepository;
 import ru.practicum.user.model.User;
@@ -107,8 +107,18 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public EventRequestStatusUpdateResult updateEventRequest(long userId, long eventId, EventConfirmedRequests eventConfirmedRequests) {
-        return null;
+    public EventRequestStatusUpdateResult updateEventRequest(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
+        User initiator = findUser(userId);
+        Event event = findEvent(eventId);
+        checkEventAndInitiator(event, initiator);
+        List<Long> ids = eventRequestStatusUpdateRequest.getRequestIds();
+        List<Request> requests = findRequestsAndCheck(eventRequestStatusUpdateRequest);
+        Map<Long, Long> confirmedReq = requestService.getConfirmedRequests(List.of(event));
+        long confirmedReqForEvent = confirmedReq.getOrDefault(event.getId(), 0L);
+        if (confirmedReqForEvent == event.getParticipantLimit()) {
+            throw new RequestException("Participant limit full");
+        }
+        return updateRequestsAndConvertToDto(requests, confirmedReqForEvent, event, eventRequestStatusUpdateRequest);
     }
 
     @Override
@@ -139,25 +149,31 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid, String rangeStart, String rangeEnd, Boolean available, String sort, int from, int size, HttpServletRequest request) {
+    public List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid, String rangeStart,
+                                               String rangeEnd, Boolean available, String sort, int from, int size, HttpServletRequest request) {
         checkStartAndEnd(rangeStart, rangeEnd);
         List<Event> events = publicParamFilter(text, categories, paid, rangeStart, rangeEnd, available, sort);
         List<EventShortDto> result = getViewsAndConfirmedRequestsForShortDto(events);
-        Sort methodOfSort;
-        if (sort != null && sort.equals("EVENT_DATE")) {
-            methodOfSort = Sort.by("evenDate");
-        } else {
-            methodOfSort = Sort.by("id");
+        PublicEventSort eventSort = PublicEventSort.parseSort(sort)
+                .orElseThrow(() -> new NotFoundElementException("Sort not found"));
+        result = result.subList(from, result.size());
+        if (result.size() > size) {
+            result = result.subList(0, size);
         }
-        Pageable pageable = PageRequest.of(from / size, size, methodOfSort);
-        //todo сделать pageable
-        return ;
+        if (eventSort.equals(PublicEventSort.EVENT_DATE)) {
+            return result.stream()
+                    .sorted(Comparator.comparing(EventShortDto::getEventDate))
+                    .collect(Collectors.toList());
+        }
+        return result.stream()
+                .sorted(Comparator.comparing(EventShortDto::getViews))
+                .collect(Collectors.toList());
     }
-
 
     @Override
     @Transactional
-    public List<EventFullDto> getEventsAdmin(List<Long> users, List<String> states, List<Long> categories, String rangeStart, String rangeEnd, int from, int size) {
+    public List<EventFullDto> getEventsAdmin(List<Long> users, List<String> states, List<Long> categories,
+                                             String rangeStart, String rangeEnd, int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size);
         checkStartAndEnd(rangeStart, rangeEnd);
         List<Event> events = adminParamFilter(users, states, categories, rangeStart, rangeEnd);
@@ -302,9 +318,11 @@ public class EventServiceImpl implements EventService {
             event.setIsRequestModeration(updateEventRequestDto.getIsRequestModeration());
         }
         if (updateEventRequestDto.getStateAction() != null) {
-            if (event.getState().equals(EventState.PENDING) && updateEventRequestDto.getStateAction().equals(StateAction.CANCEL_REVIEW)) {
+            if (event.getState().equals(EventState.PENDING) && updateEventRequestDto.getStateAction()
+                    .equals(StateAction.CANCEL_REVIEW)) {
                 event.setState(EventState.CANCELED);
-            } else if (event.getState().equals(EventState.CANCELED) && updateEventRequestDto.getStateAction().equals(StateAction.SEND_TO_REVIEW)) {
+            } else if (event.getState().equals(EventState.CANCELED) && updateEventRequestDto.getStateAction()
+                    .equals(StateAction.SEND_TO_REVIEW)) {
                 event.setState(EventState.PENDING);
             }
         }
@@ -410,7 +428,8 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    private List<Event> adminParamFilter(List<Long> users, List<String> states, List<Long> categories, String rangeStart, String rangeEnd) {
+    private List<Event> adminParamFilter(List<Long> users, List<String> states, List<Long> categories,
+                                         String rangeStart, String rangeEnd) {
         List<Event> events = eventRepository.findAll();
         if (users != null && !users.isEmpty()) {
             events = events.stream()
@@ -446,12 +465,13 @@ public class EventServiceImpl implements EventService {
         return events;
     }
 
-    private List<Event> publicParamFilter(String text, List<Long> categories, Boolean paid, String rangeStart, String rangeEnd, Boolean available, String sort) {
+    private List<Event> publicParamFilter(String text, List<Long> categories, Boolean paid, String rangeStart,
+                                          String rangeEnd, Boolean available, String sort) {
         List<Event> events = eventRepository.findAll();
         if (text != null) {
             events = events.stream()
                     .filter(event -> event.getDescription().toLowerCase().contains(text.toLowerCase())
-                    || event.getAnnotation().toLowerCase().contains(text.toLowerCase()))
+                            || event.getAnnotation().toLowerCase().contains(text.toLowerCase()))
                     .collect(Collectors.toList());
         }
         if (categories != null) {
@@ -483,5 +503,59 @@ public class EventServiceImpl implements EventService {
                     .collect(Collectors.toList());
         }
         return events;
+    }
+
+    private List<Request> findRequestsAndCheck(EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
+        List<Long> ids = eventRequestStatusUpdateRequest.getRequestIds();
+        List<Request> requests = requestRepository.findAllByIdIn(ids);
+        for (Request request : requests) {
+            if (!ids.contains(request.getId())) {
+                throw new NotFoundElementException("Request with id " + request.getId() + " not found");
+            }
+            if (!request.getStatus().equals(RequestStatus.PENDING)) {
+                throw new RequestException("Request with id " + request.getId() + " dont have status PENDING");
+            }
+        }
+        return requests;
+    }
+
+    private void checkEventAndInitiator(Event event, User initiator) {
+        if (event.getInitiator().getId() != initiator.getId()) {
+            throw new NotFoundElementException("User with id " + initiator.getId() + " cant update event with id" + event.getId());
+        }
+        if (event.getParticipantLimit() == 0 || !event.getIsRequestModeration()) {
+            throw new RequestException("Cant update, participantLimit = 0 or requestModeration = false");
+        }
+    }
+
+    private EventRequestStatusUpdateResult updateRequestsAndConvertToDto(List<Request> requests, long confirmedReqForEvent,
+                                                                         Event event, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
+        List<RequestDto> confirmedRequests = new ArrayList<>();
+        List<RequestDto> rejectedRequests = new ArrayList<>();
+        for (Request req : requests) {
+            if (confirmedReqForEvent < event.getParticipantLimit()) {
+                RequestStatus requestStatus = RequestStatus.parseStatus(eventRequestStatusUpdateRequest.getStatus())
+                        .orElseThrow(() -> new NotFoundElementException("RequestStatus not found"));
+                if (requestStatus.equals(RequestStatus.CONFIRMED)) {
+                    req.setStatus(RequestStatus.CONFIRMED);
+                    requestRepository.save(req);
+                    confirmedRequests.add(RequestMapper.requestToDto(req));
+                }
+                if (requestStatus.equals(RequestStatus.REJECTED)) {
+                    req.setStatus(RequestStatus.REJECTED);
+                    requestRepository.save(req);
+                    confirmedRequests.add(RequestMapper.requestToDto(req));
+                }
+            } else {
+                req.setStatus(RequestStatus.REJECTED);
+                requestRepository.save(req);
+                rejectedRequests.add(RequestMapper.requestToDto(req));
+            }
+        }
+        return EventRequestStatusUpdateResult.builder()
+                .confirmedRequests(confirmedRequests)
+                .rejectedRequests(rejectedRequests)
+                .build();
+
     }
 }
