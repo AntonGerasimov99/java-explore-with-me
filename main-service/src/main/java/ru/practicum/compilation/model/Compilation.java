@@ -1,8 +1,10 @@
 package ru.practicum.compilation.model;
 
 import lombok.*;
+import ru.practicum.event.model.Event;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -23,4 +25,10 @@ public class Compilation {
 
     @Column(name = "title", nullable = false, length = 50)
     private String title;
+
+    @ManyToMany
+    @JoinTable(name = "compilations_events",
+            joinColumns = @JoinColumn(name = "compilation_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id"))
+    private Set<Event> events;
 }
