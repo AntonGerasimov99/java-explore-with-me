@@ -66,7 +66,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public EventFullDto updateEvent(long userId, long eventId, UpdateEventRequestDto updateEventRequestDto) {
+    public EventFullDto updateEventPrivate(long userId, long eventId, UpdateEventRequestDto updateEventRequestDto) {
         User initiator = findUser(userId);
         Event event = findEvent(eventId);
         if (initiator.getId() != event.getInitiator().getId()) {
@@ -84,7 +84,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public EventFullDto getEvent(long userId, long eventId) {
+    public EventFullDto getEventPrivate(long userId, long eventId) {
         User user = findUser(userId);
         Optional<Event> event = eventRepository.findByInitiatorIdAndId(userId, eventId);
         if (event.isEmpty()) {
@@ -97,7 +97,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public List<EventShortDto> getEventsPublic(long userId, int from, int size) {
+    public List<EventShortDto> getEventsPrivate(long userId, int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("id"));
         Page<Event> events = eventRepository.findAllByInitiatorId(userId, pageable);
         List<EventShortDto> eventsDto = getViewsAndConfirmedRequestsForShortDto(events.toList());
@@ -107,7 +107,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public EventRequestStatusUpdateResult updateEventRequest(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
+    public EventRequestStatusUpdateResult updateEventRequestPrivate(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
         User initiator = findUser(userId);
         Event event = findEvent(eventId);
         checkEventAndInitiator(event, initiator);
@@ -123,7 +123,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public List<RequestDto> getEventRequests(long userId, long eventId) {
+    public List<RequestDto> getEventRequestsPrivate(long userId, long eventId) {
         User initiator = findUser(userId);
         Event event = findEvent(eventId);
         if (event.getInitiator().getId() != initiator.getId()) {

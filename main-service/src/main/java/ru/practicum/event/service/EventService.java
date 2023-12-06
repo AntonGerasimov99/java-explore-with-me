@@ -11,15 +11,15 @@ public interface EventService {
 
     EventFullDto createEvent(long userId, NewEventDto newEventDto);
 
-    EventFullDto updateEvent(long userId, long eventId, UpdateEventRequestDto updateEventRequestDto);
+    EventFullDto updateEventPrivate(long userId, long eventId, UpdateEventRequestDto updateEventRequestDto);
 
-    EventFullDto getEvent(long userId, long eventId);
+    EventFullDto getEventPrivate(long userId, long eventId);
 
-    List<EventShortDto> getEventsPublic(long userId, int from, int size);
+    List<EventShortDto> getEventsPrivate(long userId, int from, int size);
 
-    EventRequestStatusUpdateResult updateEventRequest(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
+    EventRequestStatusUpdateResult updateEventRequestPrivate(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
 
-    List<RequestDto> getEventRequests(long userId, long eventId);
+    List<RequestDto> getEventRequestsPrivate(long userId, long eventId);
 
     EventFullDto getEventPublic(long eventId, HttpServletRequest request);
 
