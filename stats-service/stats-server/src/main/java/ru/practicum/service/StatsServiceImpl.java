@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.StatisticRequestDto;
 import ru.practicum.dto.StatisticResponseDto;
+import ru.practicum.exception.ValidationException;
 import ru.practicum.mapper.HitMapper;
 import ru.practicum.model.App;
 import ru.practicum.storage.AppRepository;
@@ -48,6 +49,9 @@ public class StatsServiceImpl implements StatsService {
         LocalDateTime startTime = LocalDateTime.parse(start, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         LocalDateTime endTime = LocalDateTime.parse(end, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
+        if (startTime.isAfter(endTime)) {
+            throw new ValidationException("Start date is after end date");
+        }
         if (unique && uris.isPresent()) {
             log.info("Hit getStatsByTimeAndUrisUnique");
             return hitRepository.getStatsByTimeAndUrisUnique(startTime, endTime, uris.get());
