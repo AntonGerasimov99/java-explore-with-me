@@ -37,7 +37,7 @@ services:
 
   ewm-db:
     image: postgres:14-alpine
-    container_name: main-service-db
+    container_name: main-server-db
     ports:
       - "6541:5432"
     environment:
