@@ -16,16 +16,16 @@ import java.util.List;
 @Slf4j
 public class ErrorHandler {
 
-    @ExceptionHandler
+    @ExceptionHandler({NotFoundElementException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError errorNotFound(NotFoundElementException e) {
+    public ApiError errorNotFound(final Exception e) {
         List<String> errors = getErrors(e);
         return convertExceptionToApi(e, errors);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({ValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError errorBadRequest(ValidationException e) {
+    public ApiError errorBadRequest(final Exception e) {
         List<String> errors = getErrors(e);
         return convertExceptionToApi(e, errors);
     }
