@@ -53,14 +53,14 @@ public class EventServiceImpl implements EventService {
     private final StatsClient statsClient;
     private final ObjectMapper objectMapper;
     private final RequestService requestService;
-    private final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final DateTimeFormatter date = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     @Transactional
     public EventFullDto createEvent(long userId, NewEventDto newEventDto) {
         Event event = checkAndMappingEvent(userId, newEventDto);
         Event newEvent = eventRepository.save(event);
-        log.info("New event saved with id: {}", newEvent);
+        log.info("New event saved with id: {}, timestamp {}", newEvent.getId(), newEvent.getCreatedOn());
         return EventMapper.eventToFullDto(newEvent);
     }
 
@@ -234,7 +234,7 @@ public class EventServiceImpl implements EventService {
     }
 
     private LocalDateTime parseAndCheckEventDate(NewEventDto newEventDto) {
-        LocalDateTime result = LocalDateTime.parse(newEventDto.getEventDate(), DATE);
+        LocalDateTime result = LocalDateTime.parse(newEventDto.getEventDate(), date);
         if (result.isBefore(LocalDateTime.now().plusHours(2))) {
             throw new ValidationException("Time of event cant be earlier than 2 hours");
         }
@@ -273,7 +273,7 @@ public class EventServiceImpl implements EventService {
             uris.add("/events/" + e.getId());
         }
         Map<Long, Long> result = new HashMap<>();
-        ResponseEntity<Object> response = statsClient.getStats(start.format(DATE), end.format(DATE), uris, true);
+        ResponseEntity<Object> response = statsClient.getStats(start.format(date), end.format(date), uris, true);
         List<StatisticResponseDto> stats = objectMapper.convertValue(response.getBody(), new TypeReference<>() {
         });
         if (!stats.isEmpty()) {
@@ -287,10 +287,10 @@ public class EventServiceImpl implements EventService {
 
     private Event updateEventFromRequest(Event event, UpdateEventRequestDto updateEventRequestDto) {
         if (updateEventRequestDto.getEventDate() != null) {
-            if (LocalDateTime.parse(updateEventRequestDto.getEventDate(), DATE).isBefore(LocalDateTime.now().plusHours(2))) {
+            if (LocalDateTime.parse(updateEventRequestDto.getEventDate(), date).isBefore(LocalDateTime.now().plusHours(2))) {
                 throw new ValidationException("Time of event cant be earlier than 2 hours");
             }
-            event.setEventDate(LocalDateTime.parse(updateEventRequestDto.getEventDate(), DATE));
+            event.setEventDate(LocalDateTime.parse(updateEventRequestDto.getEventDate(), date));
         }
         if (updateEventRequestDto.getCategory() != null) {
             Category categoryFromRep = findCategory(updateEventRequestDto.getCategory());
@@ -335,10 +335,10 @@ public class EventServiceImpl implements EventService {
 
     private Event updateEventFromRequestAdmin(Event event, UpdateEventRequestDto updateEventRequestDto) {
         if (updateEventRequestDto.getEventDate() != null) {
-            if (LocalDateTime.parse(updateEventRequestDto.getEventDate(), DATE).isBefore(LocalDateTime.now().plusHours(1))) {
-                throw new RequestException("Time of event cant be earlier than 1 hours");
+            if (LocalDateTime.parse(updateEventRequestDto.getEventDate(), date).isBefore(LocalDateTime.now().plusHours(1))) {
+                throw new ValidationException("Time of event cant be earlier than 1 hours");
             }
-            event.setEventDate(LocalDateTime.parse(updateEventRequestDto.getEventDate(), DATE));
+            event.setEventDate(LocalDateTime.parse(updateEventRequestDto.getEventDate(), date));
         }
         if (updateEventRequestDto.getStateAction() != null) {
             if (!event.getState().equals(EventState.PENDING)) {
@@ -422,10 +422,10 @@ public class EventServiceImpl implements EventService {
         LocalDateTime start = null;
         LocalDateTime end = null;
         if (rangeStart != null) {
-            start = LocalDateTime.parse(rangeStart, DATE);
+            start = LocalDateTime.parse(rangeStart, date);
         }
         if (rangeEnd != null) {
-            end = LocalDateTime.parse(rangeEnd, DATE);
+            end = LocalDateTime.parse(rangeEnd, date);
         }
         if (start != null && end != null && start.isAfter(end)) {
             throw new ValidationException("Start can not be after end");
@@ -455,13 +455,13 @@ public class EventServiceImpl implements EventService {
                     .collect(Collectors.toList());
         }
         if (rangeStart != null) {
-            LocalDateTime start = LocalDateTime.parse(rangeStart, DATE);
+            LocalDateTime start = LocalDateTime.parse(rangeStart, date);
             events = events.stream()
                     .filter(event -> event.getEventDate().isAfter(start))
                     .collect(Collectors.toList());
         }
         if (rangeStart != null) {
-            LocalDateTime end = LocalDateTime.parse(rangeEnd, DATE);
+            LocalDateTime end = LocalDateTime.parse(rangeEnd, date);
             events = events.stream()
                     .filter(event -> event.getEventDate().isBefore(end))
                     .collect(Collectors.toList());
@@ -495,13 +495,13 @@ public class EventServiceImpl implements EventService {
                     .collect(Collectors.toList());
         }
         if (rangeStart != null) {
-            LocalDateTime start = LocalDateTime.parse(rangeStart, DATE);
+            LocalDateTime start = LocalDateTime.parse(rangeStart, date);
             events = events.stream()
                     .filter(event -> event.getEventDate().isAfter(start))
                     .collect(Collectors.toList());
         }
         if (rangeStart != null) {
-            LocalDateTime end = LocalDateTime.parse(rangeEnd, DATE);
+            LocalDateTime end = LocalDateTime.parse(rangeEnd, date);
             events = events.stream()
                     .filter(event -> event.getEventDate().isBefore(end))
                     .collect(Collectors.toList());
@@ -548,7 +548,7 @@ public class EventServiceImpl implements EventService {
                 if (requestStatus.equals(RequestStatus.REJECTED)) {
                     req.setStatus(RequestStatus.REJECTED);
                     requestRepository.save(req);
-                    confirmedRequests.add(RequestMapper.requestToDto(req));
+                    rejectedRequests.add(RequestMapper.requestToDto(req));
                 }
             } else {
                 req.setStatus(RequestStatus.REJECTED);

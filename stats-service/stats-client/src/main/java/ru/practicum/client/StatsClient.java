@@ -27,11 +27,12 @@ public class StatsClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> save(HttpServletRequest request) {
+    public ResponseEntity<Object> save(HttpServletRequest request, String app) {
+        String ip = request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ? "127.0.0.1" : request.getRemoteAddr();
         return post("/hit", new StatisticRequestDto(
-                request.getContextPath(),
+                app,
                 request.getRequestURI(),
-                request.getRemoteAddr(),
+                ip,
                 LocalDateTime.now()
         ));
     }
@@ -40,7 +41,7 @@ public class StatsClient extends BaseClient {
         Map<String, Object> parameters = Map.of(
                 "start", start,
                 "end", end,
-                "uris", uris,
+                "uris", String.join(",", uris),
                 "unique", unique
         );
         return get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);

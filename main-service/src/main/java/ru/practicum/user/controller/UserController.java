@@ -11,7 +11,6 @@ import ru.practicum.user.service.UserService;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController

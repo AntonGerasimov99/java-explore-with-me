@@ -65,8 +65,8 @@ public class CategoryServiceImpl implements CategoryService {
         if (checkName.isPresent() && checkName.get().getId() != categoryId) {
             throw new RequestException("Category name already present");
         }
-        category.setName(category.getName());
-        categoryRepository.save(category);
+        category.setName(categoryDto.getName());
+        category = categoryRepository.save(category);
         log.info("Category with id = {} updated", category.getId());
         return CategoryMapper.categoryToDto(category);
     }

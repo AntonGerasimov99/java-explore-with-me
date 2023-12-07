@@ -55,6 +55,6 @@ public class EventController {
 
     private void sendStat(HttpServletRequest request) {
         log.info("Sending to stat client request. URI: {}. IP: {}", request.getRequestURI(), request.getRemoteAddr());
-        statsClient.save(request);
+        statsClient.save(request, "ewm-main-service");
     }
 }
