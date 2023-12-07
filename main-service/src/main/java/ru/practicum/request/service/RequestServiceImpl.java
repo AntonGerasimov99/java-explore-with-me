@@ -73,7 +73,7 @@ public class RequestServiceImpl implements RequestService {
         List<Long> eventIds = events.stream()
                 .map(Event::getId)
                 .collect(Collectors.toList());
-        List<EventConfirmedRequests> confirmedRequests = requestRepository.findConfirmedRequestsByEventId(eventIds);
+        List<EventConfirmedRequests> confirmedRequests = requestRepository.findConfirmedRequestsByEventsId(eventIds);
         Map<Long, Long> result = new HashMap<>();
         if (confirmedRequests.isEmpty()) {
             return result;
@@ -92,7 +92,7 @@ public class RequestServiceImpl implements RequestService {
         if (request.getEvent().getInitiator().getId() == request.getRequester().getId()) {
             throw new RequestException(("Owner of event cant send request"));
         }
-        EventConfirmedRequests amountConfirmedRequests = requestRepository.getAmountOfConfirmedRequests(request.getEvent().getId());
+        EventConfirmedRequests amountConfirmedRequests = requestRepository.findConfirmedRequestsByEventId(request.getEvent().getId());
         long count = (amountConfirmedRequests == null) ? 0 : amountConfirmedRequests.getAmountConfirmedRequests();
         if (request.getEvent().getParticipantLimit() != 0 && count == request.getEvent().getParticipantLimit()) {
             throw new RequestException("Participant limit exceeded");

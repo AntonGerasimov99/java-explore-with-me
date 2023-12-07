@@ -13,7 +13,6 @@ import javax.validation.constraints.Positive;
 import java.util.List;
 
 @RestController
-@AllArgsConstructor
 @RequiredArgsConstructor
 @Validated
 @Slf4j
@@ -30,7 +29,7 @@ public class RequestController {
         return requestService.createRequest(userId, eventId);
     }
 
-    @PatchMapping(path = "/{requestId/cancel")
+    @PatchMapping(path = "/{requestId}/cancel")
     @ResponseStatus(HttpStatus.OK)
     public RequestDto cancelRequest(@PathVariable long userId,
                                     @PathVariable long requestId) {

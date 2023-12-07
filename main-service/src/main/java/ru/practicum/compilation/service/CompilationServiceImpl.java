@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@AllArgsConstructor
 @Slf4j
 public class CompilationServiceImpl implements CompilationService {
 

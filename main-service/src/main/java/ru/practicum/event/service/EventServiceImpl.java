@@ -129,7 +129,7 @@ public class EventServiceImpl implements EventService {
         if (event.getInitiator().getId() != initiator.getId()) {
             throw new NotFoundElementException("User can not update event request");
         }
-        List<Request> requests = requestRepository.findAllByEventIn(eventId);
+        List<Request> requests = requestRepository.findAllByEventId(eventId);
         return requests.stream()
                 .map(RequestMapper::requestToDto)
                 .collect(Collectors.toList());

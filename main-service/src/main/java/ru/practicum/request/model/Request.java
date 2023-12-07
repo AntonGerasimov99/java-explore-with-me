@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 @Entity
+@NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Table(name = "requests")
 public class Request {
 
