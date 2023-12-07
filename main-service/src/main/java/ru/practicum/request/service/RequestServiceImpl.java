@@ -89,7 +89,7 @@ public class RequestServiceImpl implements RequestService {
         if (optionalRequest.isPresent()) {
             throw new RequestException("User with id" + request.getRequester().getId() + " already send request for event with id:" + request.getEvent().getId());
         }
-        if (request.getEvent().getInitiator().getId() == request.getRequester().getId()) {
+        if (request.getEvent().getInitiator().getId().equals(request.getRequester().getId())) {
             throw new RequestException(("Owner of event cant send request"));
         }
         EventConfirmedRequests amountConfirmedRequests = requestRepository.findConfirmedRequestsByEventId(request.getEvent().getId());

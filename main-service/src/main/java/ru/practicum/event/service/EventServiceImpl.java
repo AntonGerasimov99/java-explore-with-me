@@ -69,7 +69,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto updateEventPrivate(long userId, long eventId, UpdateEventRequestDto updateEventRequestDto) {
         User initiator = findUser(userId);
         Event event = findEvent(eventId);
-        if (initiator.getId() != event.getInitiator().getId()) {
+        if (!initiator.getId().equals(event.getInitiator().getId())) {
             throw new NotFoundElementException("User id " + initiator.getId() + "not initiator event with id" + event.getId());
         }
         if (event.getState().equals(EventState.PUBLISHED)) {
@@ -126,7 +126,7 @@ public class EventServiceImpl implements EventService {
     public List<RequestDto> getEventRequestsPrivate(long userId, long eventId) {
         User initiator = findUser(userId);
         Event event = findEvent(eventId);
-        if (event.getInitiator().getId() != initiator.getId()) {
+        if (!event.getInitiator().getId().equals(initiator.getId())) {
             throw new NotFoundElementException("User can not update event request");
         }
         List<Request> requests = requestRepository.findAllByEventId(eventId);
@@ -524,7 +524,7 @@ public class EventServiceImpl implements EventService {
     }
 
     private void checkEventAndInitiator(Event event, User initiator) {
-        if (event.getInitiator().getId() != initiator.getId()) {
+        if (!event.getInitiator().getId().equals(initiator.getId())) {
             throw new NotFoundElementException("User with id " + initiator.getId() + " cant update event with id" + event.getId());
         }
         if (event.getParticipantLimit() == 0 || !event.getIsRequestModeration()) {
