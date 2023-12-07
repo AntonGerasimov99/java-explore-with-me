@@ -1,7 +1,12 @@
 package ru.practicum.exception;
 
-public class RequestException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+@ResponseStatus(HttpStatus.CONFLICT)
+public class RequestException extends ResponseStatusException {
     public RequestException(String ex) {
-        super(ex);
+        super(HttpStatus.CONFLICT, ex);
     }
 }

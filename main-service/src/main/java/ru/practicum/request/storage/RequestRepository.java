@@ -30,7 +30,7 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     @Query("select new ru.practicum.request.dto.EventConfirmedRequests(r.event.id, count(r.id)) " +
             "from Request as r " +
-            "where r.event.id = :eventIds and r.status = 'CONFIRMED' " +
+            "where r.event.id = :eventId and r.status = 'CONFIRMED' " +
             "group by r.event.id")
     EventConfirmedRequests findConfirmedRequestsByEventId(long eventId);
 }

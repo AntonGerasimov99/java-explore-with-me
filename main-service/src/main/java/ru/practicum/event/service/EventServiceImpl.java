@@ -177,6 +177,10 @@ public class EventServiceImpl implements EventService {
         Pageable pageable = PageRequest.of(from / size, size);
         checkStartAndEnd(rangeStart, rangeEnd);
         List<Event> events = adminParamFilter(users, states, categories, rangeStart, rangeEnd);
+        events = events.subList(from, events.size());
+        if (events.size() > size) {
+            events = events.subList(0, size);
+        }
         return events.stream()
                 .map(this::getViewsAndConfirmedRequestsForFullDto)
                 .collect(Collectors.toList());
@@ -314,15 +318,15 @@ public class EventServiceImpl implements EventService {
         if (updateEventRequestDto.getParticipantLimit() != null) {
             event.setParticipantLimit(updateEventRequestDto.getParticipantLimit());
         }
-        if (updateEventRequestDto.getIsRequestModeration() != null) {
-            event.setIsRequestModeration(updateEventRequestDto.getIsRequestModeration());
+        if (updateEventRequestDto.getRequestModeration() != null) {
+            event.setIsRequestModeration(updateEventRequestDto.getRequestModeration());
         }
         if (updateEventRequestDto.getStateAction() != null) {
             if (event.getState().equals(EventState.PENDING) && updateEventRequestDto.getStateAction()
-                    .equals(StateAction.CANCEL_REVIEW)) {
+                    .equals(StateAction.CANCEL_REVIEW.toString())) {
                 event.setState(EventState.CANCELED);
             } else if (event.getState().equals(EventState.CANCELED) && updateEventRequestDto.getStateAction()
-                    .equals(StateAction.SEND_TO_REVIEW)) {
+                    .equals(StateAction.SEND_TO_REVIEW.toString())) {
                 event.setState(EventState.PENDING);
             }
         }
@@ -340,10 +344,10 @@ public class EventServiceImpl implements EventService {
             if (!event.getState().equals(EventState.PENDING)) {
                 throw new ValidationException("Incorrect EventState");
             }
-            if (updateEventRequestDto.getStateAction().equals(StateAction.PUBLISH_EVENT)) {
+            if (updateEventRequestDto.getStateAction().equals(StateAction.PUBLISH_EVENT.toString())) {
                 event.setState(EventState.PUBLISHED);
             }
-            if (updateEventRequestDto.getStateAction().equals(StateAction.REJECT_EVENT)) {
+            if (updateEventRequestDto.getStateAction().equals(StateAction.REJECT_EVENT.toString())) {
                 event.setState(EventState.CANCELED);
             }
         }
@@ -373,8 +377,8 @@ public class EventServiceImpl implements EventService {
         if (updateEventRequestDto.getParticipantLimit() != null) {
             event.setParticipantLimit(updateEventRequestDto.getParticipantLimit());
         }
-        if (updateEventRequestDto.getIsRequestModeration() != null) {
-            event.setIsRequestModeration(updateEventRequestDto.getIsRequestModeration());
+        if (updateEventRequestDto.getRequestModeration() != null) {
+            event.setIsRequestModeration(updateEventRequestDto.getRequestModeration());
         }
         return event;
     }
@@ -487,7 +491,7 @@ public class EventServiceImpl implements EventService {
         if (available != null) {
             Map<Long, Long> confirmedRequests = requestService.getConfirmedRequests(events);
             events = events.stream()
-                    .filter(event -> event.getParticipantLimit() == 0 || confirmedRequests.get(event.getId()) < event.getParticipantLimit())
+                    .filter(event -> event.getParticipantLimit() == 0 || confirmedRequests.getOrDefault(event.getId(), 0L) < event.getParticipantLimit()) // todo проверить
                     .collect(Collectors.toList());
         }
         if (rangeStart != null) {

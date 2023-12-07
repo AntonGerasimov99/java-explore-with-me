@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.event.model.Location;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
@@ -30,7 +28,6 @@ public class UpdateEventRequestDto {
 
     private Location location;
 
-    @NotBlank
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private String eventDate;
 
@@ -38,7 +35,7 @@ public class UpdateEventRequestDto {
 
     private Boolean paid;
 
-    private Boolean isRequestModeration;
+    private Boolean requestModeration;
 
     private String stateAction;
 }

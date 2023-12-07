@@ -44,6 +44,7 @@ public class CompilationServiceImpl implements CompilationService {
         }
         Compilation compilation = CompilationMapper.dtoToCompilation(newCompilationDto);
         List<Event> events = eventRepository.findAllById(newCompilationDto.getEvents());
+        compilation.setEvents((Set<Event>) events);
         List<EventShortDto> eventShort = events.stream()
                 .map(EventMapper::eventToShortDto)
                 .collect(Collectors.toList());

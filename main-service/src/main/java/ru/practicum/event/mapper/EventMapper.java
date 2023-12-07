@@ -26,8 +26,8 @@ public class EventMapper {
         if (newEventDto.getPaid() == null) {
             newEventDto.setPaid(false);
         }
-        if (newEventDto.getIsRequestModeration() == null) {
-            newEventDto.setIsRequestModeration(true);
+        if (newEventDto.getRequestModeration() == null) {
+            newEventDto.setRequestModeration(true);
         }
         Event event = Event.builder()
                 .title(newEventDto.getTitle())
@@ -38,6 +38,21 @@ public class EventMapper {
                 .location(location)
                 .eventDate(eventDate)
                 .build();
+        if (newEventDto.getPaid() == null) {
+            event.setPaid(false);
+        } else {
+            event.setPaid(newEventDto.getPaid());
+        }
+        if (newEventDto.getRequestModeration() == null) {
+            event.setIsRequestModeration(false);
+        } else {
+            event.setIsRequestModeration(newEventDto.getRequestModeration());
+        }
+        if (newEventDto.getParticipantLimit() == null) {
+            event.setParticipantLimit(0);
+        } else {
+            event.setParticipantLimit(newEventDto.getParticipantLimit());
+        }
         event.setState(EventState.PENDING);
         return event;
     }
@@ -53,10 +68,10 @@ public class EventMapper {
                 .location(LocationMapper.locationToDto(event.getLocation()))
                 .eventDate(event.getEventDate())
                 .createdOn(event.getCreatedOn())
-                .publishedTime(event.getPublishedTime())
+                .publishedOn(event.getPublishedTime())
                 .participantLimit(event.getParticipantLimit())
                 .paid(event.getPaid())
-                .isRequestModeration(event.getIsRequestModeration())
+                .requestModeration(event.getIsRequestModeration())
                 .state(event.getState())
                 .build();
     }

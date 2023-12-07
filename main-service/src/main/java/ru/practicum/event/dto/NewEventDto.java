@@ -42,5 +42,5 @@ public class NewEventDto {
 
     private Boolean paid;
 
-    private Boolean isRequestModeration;
+    private Boolean requestModeration;
 }

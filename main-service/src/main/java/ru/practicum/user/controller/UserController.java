@@ -35,9 +35,6 @@ public class UserController {
     public List<UserDto> getUsers(@RequestParam(name = "ids", required = false) List<Long> ids,
                                   @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero int from,
                                   @RequestParam(name = "size", defaultValue = "10") @Positive int size) {
-        if (ids == null) {
-            ids = new ArrayList<>();
-        }
         log.info("Received request to list user from {}, size {}", from, size);
         return userService.getUsersList(ids, from, size);
     }

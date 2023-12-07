@@ -23,7 +23,7 @@ public class EventControllerPrivate {
     private final EventService eventService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(@PathVariable long userId,
                                     @Valid @RequestBody NewEventDto newEventDto) {
         log.info("Receive request to create event by user with id {}", userId);

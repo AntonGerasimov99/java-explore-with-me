@@ -47,6 +47,7 @@ public class UserServiceImpl implements UserService {
                     .map(UserMapper::userToDto)
                     .collect(Collectors.toList());
         }
+        log.info("List size = {}", result.size());
         return result;
     }
 
