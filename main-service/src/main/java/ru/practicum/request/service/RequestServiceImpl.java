@@ -84,7 +84,6 @@ public class RequestServiceImpl implements RequestService {
         return result;
     }
 
-
     private void checkRequest(Request request, Optional<Request> optionalRequest) {
         if (optionalRequest.isPresent()) {
             throw new RequestException("User with id" + request.getRequester().getId() + " already send request for event with id:" + request.getEvent().getId());
