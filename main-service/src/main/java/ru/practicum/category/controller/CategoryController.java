@@ -31,8 +31,8 @@ public class CategoryController {
 
     @GetMapping(path = "/{catId}")
     @ResponseStatus(HttpStatus.OK)
-    public CategoryDto getCategory(@PathVariable long categoryId) {
-        log.info("Received request to get category with id {}", categoryId);
-        return categoryService.getCategory(categoryId);
+    public CategoryDto getCategory(@PathVariable long catId) {
+        log.info("Received request to get category with id {}", catId);
+        return categoryService.getCategory(catId);
     }
 }

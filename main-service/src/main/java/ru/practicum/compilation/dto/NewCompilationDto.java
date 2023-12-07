@@ -8,13 +8,14 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
 @AllArgsConstructor
 public class NewCompilationDto {
 
-    private List<Long> events;
+    private Set<Long> events;
     private Boolean pinned;
     @NotBlank
     @NotNull

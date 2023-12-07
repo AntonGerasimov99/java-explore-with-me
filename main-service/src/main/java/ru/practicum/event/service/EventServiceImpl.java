@@ -336,13 +336,13 @@ public class EventServiceImpl implements EventService {
     private Event updateEventFromRequestAdmin(Event event, UpdateEventRequestDto updateEventRequestDto) {
         if (updateEventRequestDto.getEventDate() != null) {
             if (LocalDateTime.parse(updateEventRequestDto.getEventDate(), DATE).isBefore(LocalDateTime.now().plusHours(1))) {
-                throw new ValidationException("Time of event cant be earlier than 1 hours");
+                throw new RequestException("Time of event cant be earlier than 1 hours");
             }
             event.setEventDate(LocalDateTime.parse(updateEventRequestDto.getEventDate(), DATE));
         }
         if (updateEventRequestDto.getStateAction() != null) {
             if (!event.getState().equals(EventState.PENDING)) {
-                throw new ValidationException("Incorrect EventState");
+                throw new RequestException("Incorrect EventState");
             }
             if (updateEventRequestDto.getStateAction().equals(StateAction.PUBLISH_EVENT.toString())) {
                 event.setState(EventState.PUBLISHED);

@@ -12,8 +12,10 @@ import ru.practicum.category.mapper.CategoryMapper;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.storage.CategoryRepository;
 import ru.practicum.exception.NotFoundElementException;
+import ru.practicum.exception.RequestException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +28,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto createCategory(CategoryDto categoryDto) {
+        Optional<Category> optCategory = categoryRepository.findByName(categoryDto.getName());
         Category category = categoryRepository.save(CategoryMapper.dtoToCategory(categoryDto));
         log.info("Category with id = {} saved", category.getId());
         return CategoryMapper.categoryToDto(category);
@@ -58,6 +61,10 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto updateCategory(CategoryDto categoryDto, long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundElementException("Category with id " + categoryId + " not found"));
+        Optional<Category> checkName = categoryRepository.findByName(categoryDto.getName());
+        if (checkName.isPresent() && checkName.get().getId() != categoryId) {
+            throw new RequestException("Category name already present");
+        }
         category.setName(category.getName());
         categoryRepository.save(category);
         log.info("Category with id = {} updated", category.getId());

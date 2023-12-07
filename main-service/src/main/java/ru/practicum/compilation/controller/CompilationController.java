@@ -24,16 +24,16 @@ public class CompilationController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<CompilationDto> getCompilations(@RequestParam(required = false) Boolean pinned,
-                                                @RequestParam(required = false) @PositiveOrZero int from,
-                                                @RequestParam(required = false) @Positive int size) {
+                                                @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                                @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("Receive request to get public compilations");
         return compilationService.getCompilations(pinned, from, size);
     }
 
     @GetMapping(path = "/{compId}")
     @ResponseStatus(HttpStatus.OK)
-    public CompilationDto getCompilation(@PathVariable long compilationId) {
-        log.info("Receive request to get public compilation with id {}", compilationId);
-        return compilationService.getCompilation(compilationId);
+    public CompilationDto getCompilation(@PathVariable long compId) {
+        log.info("Receive request to get public compilation with id {}", compId);
+        return compilationService.getCompilation(compId);
     }
 }

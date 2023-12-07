@@ -1,17 +1,18 @@
 package ru.practicum.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.postgresql.util.PSQLException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController
+@RestControllerAdvice
 @Slf4j
 public class ErrorHandler {
 
@@ -29,9 +30,9 @@ public class ErrorHandler {
         return convertExceptionToApi(e, errors);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({PSQLException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError errorConflict(RequestException e) {
+    public ApiError errorConflict(final Exception e) {
         List<String> errors = getErrors(e);
         return convertExceptionToApi(e, errors);
     }

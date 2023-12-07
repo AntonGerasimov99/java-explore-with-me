@@ -27,8 +27,15 @@ public class AdminCategoryController {
     @PatchMapping(path = "/{catId}")
     @ResponseStatus(HttpStatus.OK)
     public CategoryDto updateCategory(@Valid @RequestBody CategoryDto categoryDto,
-                                      @PathVariable long categoryId) {
-        log.info("Received request to update category with id {}", categoryId);
-        return categoryService.updateCategory(categoryDto, categoryId);
+                                      @PathVariable long catId) {
+        log.info("Received request to update category with id {}, name {}", catId, categoryDto.getName());
+        return categoryService.updateCategory(categoryDto, catId);
+    }
+
+    @DeleteMapping(path = "/{catId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCategory(@PathVariable long catId) {
+        log.info("Received request to delete category with id {}", catId);
+        categoryService.deleteCategory(catId);
     }
 }

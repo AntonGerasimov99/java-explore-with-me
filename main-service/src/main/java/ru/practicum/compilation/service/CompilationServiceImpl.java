@@ -21,6 +21,7 @@ import ru.practicum.event.storage.EventRepository;
 import ru.practicum.exception.NotFoundElementException;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,11 +41,11 @@ public class CompilationServiceImpl implements CompilationService {
             newCompilationDto.setPinned(false);
         }
         if (newCompilationDto.getEvents() == null) {
-            newCompilationDto.setEvents(new ArrayList<>());
+            newCompilationDto.setEvents(new HashSet<>());
         }
         Compilation compilation = CompilationMapper.dtoToCompilation(newCompilationDto);
-        List<Event> events = eventRepository.findAllById(newCompilationDto.getEvents());
-        compilation.setEvents((Set<Event>) events);
+        Set<Event> events = eventRepository.findAllByIdIn(newCompilationDto.getEvents());
+        compilation.setEvents(events);
         List<EventShortDto> eventShort = events.stream()
                 .map(EventMapper::eventToShortDto)
                 .collect(Collectors.toList());
