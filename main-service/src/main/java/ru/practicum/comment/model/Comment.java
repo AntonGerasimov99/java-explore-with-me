@@ -41,7 +41,7 @@ public class Comment {
     @Column(name = "edited", nullable = false)
     private Boolean edited;
 
-    @Column(name = "dateEdited")
+    @Column(name = "date_edited")
     private LocalDateTime dateEdited;
 
     @Column(name = "text", nullable = false)

@@ -101,7 +101,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public List<CommentFullDto> getCommentsForUserPublic(long userId) {
         User user = findUser(userId);
-        List<CommentFullDto> result = commentRepository.findAllByUserId(userId).stream()
+        List<CommentFullDto> result = commentRepository.findAllByAuthorId(userId).stream()
                 .map(CommentMapper::commentToFullDto)
                 .collect(Collectors.toList());
         log.info("Comments for user with id {} found, size = {}", user.getId(), result.size());
