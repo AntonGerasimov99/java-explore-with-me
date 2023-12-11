@@ -14,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.storage.CategoryRepository;
 import ru.practicum.client.StatsClient;
+import ru.practicum.comment.dto.CommentFullDto;
+import ru.practicum.comment.mapper.CommentMapper;
+import ru.practicum.comment.storage.CommentRepository;
 import ru.practicum.dto.StatisticResponseDto;
 import ru.practicum.event.dto.*;
 import ru.practicum.event.mapper.EventMapper;
@@ -53,6 +56,7 @@ public class EventServiceImpl implements EventService {
     private final StatsClient statsClient;
     private final ObjectMapper objectMapper;
     private final RequestService requestService;
+    private final CommentRepository commentRepository;
     private final DateTimeFormatter date = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
@@ -61,7 +65,7 @@ public class EventServiceImpl implements EventService {
         Event event = checkAndMappingEvent(userId, newEventDto);
         Event newEvent = eventRepository.save(event);
         log.info("New event saved with id: {}, timestamp {}", newEvent.getId(), newEvent.getCreatedOn());
-        return EventMapper.eventToFullDto(newEvent);
+        return EventMapper.eventToFullDto(newEvent, getCommentForEvent(newEvent.getId()));
     }
 
     @Override
@@ -256,7 +260,7 @@ public class EventServiceImpl implements EventService {
     private EventFullDto getViewsAndConfirmedRequestsForFullDto(Event event) {
         Map<Long, Long> views = getStats(List.of(event));
         Map<Long, Long> confirmedRequests = requestService.getConfirmedRequests(List.of(event));
-        EventFullDto result = EventMapper.eventToFullDto(event);
+        EventFullDto result = EventMapper.eventToFullDto(event, getCommentForEvent(event.getId()));
         result.setConfirmedRequests(confirmedRequests.getOrDefault(event.getId(), 0L));
         result.setViews(views.getOrDefault(event.getId(), 0L));
         return result;
@@ -560,6 +564,11 @@ public class EventServiceImpl implements EventService {
                 .confirmedRequests(confirmedRequests)
                 .rejectedRequests(rejectedRequests)
                 .build();
+    }
 
+    private List<CommentFullDto> getCommentForEvent(Long eventId) {
+        return commentRepository.findAllByEventId(eventId).stream()
+                .map(CommentMapper::commentToFullDto)
+                .collect(Collectors.toList());
     }
 }

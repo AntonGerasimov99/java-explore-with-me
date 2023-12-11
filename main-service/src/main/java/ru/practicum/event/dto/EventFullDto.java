@@ -5,10 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.category.dto.CategoryDto;
+import ru.practicum.comment.dto.CommentFullDto;
 import ru.practicum.event.model.EventState;
 import ru.practicum.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -49,4 +51,6 @@ public class EventFullDto {
     private Long confirmedRequests;
 
     private Long views;
+
+    private List<CommentFullDto> comments;
 }

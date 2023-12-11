@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 @Table(name = "events")
 public class Event {
 
-    //todo добавить length??
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
