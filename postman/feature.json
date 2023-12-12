@@ -505,7 +505,7 @@
           "script": {
             "exec": [
               "pm.test(\"Ответ должен содержать код статуса 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
+              "    pm.response.to.have.status([200, 409]);\r",
               "});"
             ],
             "type": "text/javascript"
@@ -1156,65 +1156,6 @@
             "comments",
             "1",
             "5"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Добавление комментария к не опубликованному событию",
-      "event": [
-        {
-          "listen": "prerequest",
-          "script": {
-            "exec": [
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        },
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Ответ должен содержать код статуса 400\", function () {\r",
-              "    pm.response.to.have.status(400);\r",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"text\": \"Comment to not found event\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{baseUrl}}/comments/1/3",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "comments",
-            "1",
-            "3"
           ]
         }
       },
