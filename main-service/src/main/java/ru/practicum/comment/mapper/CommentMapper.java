@@ -12,7 +12,7 @@ import ru.practicum.user.model.User;
 public class CommentMapper {
 
     public static CommentFullDto commentToFullDto(Comment comment) {
-        return CommentFullDto.builder()
+        CommentFullDto result = CommentFullDto.builder()
                 .id(comment.getId())
                 .created(comment.getCreated())
                 .event(EventMapper.eventToShortDto(comment.getEvent()))
@@ -20,8 +20,11 @@ public class CommentMapper {
                 .edited(comment.getEdited())
                 .dateEdited(comment.getDateEdited())
                 .text(comment.getText())
-                .replyComment(commentToShorDto(comment.getReplyComment()))
                 .build();
+        if (comment.getReplyComment() != null) {
+            result.setReplyComment(commentToShorDto(comment.getReplyComment()));
+        }
+        return result;
     }
 
     public static CommentShortDto commentToShorDto(Comment comment) {
@@ -37,6 +40,7 @@ public class CommentMapper {
         return Comment.builder()
                 .author(author)
                 .event(event)
+                .edited(false)
                 .text(newCommentDto.getText())
                 .build();
     }

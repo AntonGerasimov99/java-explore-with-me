@@ -26,14 +26,14 @@ public class CommentController {
         return commentService.getCommentPublic(commentId);
     }
 
-    @GetMapping(path = "/{userId}")
+    @GetMapping(path = "/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public List<CommentFullDto> getCommentByUserId(@PathVariable long userId) {
         log.info("Receive request to get all comments for user with id {}", userId);
         return commentService.getCommentsForUserPublic(userId);
     }
 
-    @GetMapping(path = "/{eventId}")
+    @GetMapping(path = "/events/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     public List<CommentFullDto> getCommentByEventId(@PathVariable long eventId) {
         log.info("Receive request to get all comments for event with id {}", eventId);
