@@ -505,7 +505,7 @@
           "script": {
             "exec": [
               "pm.test(\"Ответ должен содержать код статуса 200\", function () {\r",
-              "    pm.response.to.have.status([200, 409]);\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([200,409]);\r",
               "});"
             ],
             "type": "text/javascript"
@@ -1103,7 +1103,7 @@
       "response": []
     },
     {
-      "name": "Добавление комментария к не созданному событию",
+      "name": "Добавление комментария к не опубликованному событию",
       "event": [
         {
           "listen": "prerequest",
@@ -1118,8 +1118,8 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test(\"Ответ должен содержать код статуса 404\", function () {\r",
-              "    pm.response.to.have.status(404);\r",
+              "pm.test(\"Ответ должен содержать код статуса 400\", function () {\r",
+              "    pm.response.to.have.status(400);\r",
               "});"
             ],
             "type": "text/javascript"
@@ -1148,14 +1148,14 @@
           }
         },
         "url": {
-          "raw": "{{baseUrl}}/comments/1/5",
+          "raw": "{{baseUrl}}/comments/1/3",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
             "comments",
             "1",
-            "5"
+            "3"
           ]
         }
       },
